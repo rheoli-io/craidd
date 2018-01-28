@@ -9,7 +9,7 @@ using System;
 
 namespace Craidd.Migrations
 {
-    [DbContext(typeof(AppDb))]
+    [DbContext(typeof(AppDbContext))]
     partial class AppDbModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

@@ -9,7 +9,7 @@ using System;
 
 namespace Craidd.Migrations
 {
-    [DbContext(typeof(AppDb))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20180107205949_InitialCreate")]
     partial class InitialCreate
     {

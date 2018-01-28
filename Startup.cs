@@ -26,7 +26,7 @@ namespace Craidd
         {
             var basePath = AppContext.BaseDirectory;
             var dbPath = System.IO.Path.Combine(basePath, "AppDb.db");
-            services.AddDbContext<Craidd.Services.AppDb>(opt => opt.UseSqlite("Data Source=" + dbPath));
+            services.AddDbContext<Craidd.Services.AppDbContext>(opt => opt.UseSqlite("Data Source=" + dbPath));
             services.AddMvc();
         }
 

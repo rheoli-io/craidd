@@ -7,12 +7,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 
-namespace Craidd.Migrations
+namespace Craidd.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbModelSnapshot : ModelSnapshot
+    [Migration("20180107205949_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

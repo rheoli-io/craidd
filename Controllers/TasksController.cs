@@ -4,29 +4,34 @@ using Microsoft.AspNetCore.Mvc;
 
 using Craidd.Models;
 using Craidd.Services;
+using Craidd.Data;
 
 namespace Craidd.Controllers
 {
     [Route("api/[controller]")]
     public class TasksController : Controller
     {
-        private readonly AppDbContext _db_context;
+        private readonly AppDbContext _dbContext;
+        private readonly TasksService _tasks;
 
-        public TasksController(AppDbContext context)
-        {
-            _db_context = context;
+        public TasksController(
+            AppDbContext context,
+            TasksService tasks
+        ) {
+            _dbContext = context;
+            _tasks = tasks;
         }
 
         [HttpGet]
         public IEnumerable<Task> GetAll()
         {
-            return _db_context.Tasks.ToList();
+            return _dbContext.Tasks.ToList();
         }
 
         [HttpGet("{id}", Name = "GetTask")]
         public IActionResult GetById(long id)
         {
-            var item = _db_context.Tasks.FirstOrDefault(t => t.Id == id);
+            var item = _dbContext.Tasks.FirstOrDefault(t => t.Id == id);
             if (item == null)
             {
                 return NotFound();
@@ -62,8 +67,8 @@ namespace Craidd.Controllers
                 return BadRequest();
             }
 
-            _db_context.Tasks.Add(item);
-            _db_context.SaveChanges();
+            _dbContext.Tasks.Add(item);
+            _dbContext.SaveChanges();
 
             return CreatedAtRoute("GetTask", new { id = item.Id }, item);
         }
@@ -76,7 +81,7 @@ namespace Craidd.Controllers
                 return BadRequest();
             }
 
-            var todo = _db_context.Tasks.FirstOrDefault(t => t.Id == id);
+            var todo = _dbContext.Tasks.FirstOrDefault(t => t.Id == id);
             if (todo == null)
             {
                 return NotFound();
@@ -85,8 +90,8 @@ namespace Craidd.Controllers
             todo.IsComplete = item.IsComplete;
             todo.Name = item.Name;
 
-            _db_context.Tasks.Update(todo);
-            _db_context.SaveChanges();
+            _dbContext.Tasks.Update(todo);
+            _dbContext.SaveChanges();
             return new NoContentResult();
         }
 
@@ -97,14 +102,13 @@ namespace Craidd.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(long id)
         {
-            var todo = _db_context.Tasks.FirstOrDefault(t => t.Id == id);
-            if (todo == null)
+            var deleted = _tasks.Delete(id);
+
+            if (deleted == false)
             {
                 return NotFound();
             }
 
-            _db_context.Tasks.Remove(todo);
-            _db_context.SaveChanges();
             return new NoContentResult();
         }
     }

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Craidd.Migrations
+namespace Craidd.Data.Migrations
 {
     public partial class InitialCreate : Migration
     {

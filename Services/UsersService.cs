@@ -12,16 +12,20 @@ namespace Craidd.Services
     {
         private readonly AppDbContext _dbContext;
         private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
         public UsersService(
             AppDbContext context,
-            UserManager<User> userManager
+            UserManager<User> userManager,
+            SignInManager<User> signInManager
         )
         {
             _dbContext = context;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         public UserManager<User> UserManager => _userManager;
+        public SignInManager<User> SignInManager => _signInManager;
     }
 }

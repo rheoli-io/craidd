@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using Craidd.Models;
 using Craidd.Services;
@@ -22,7 +23,7 @@ namespace Craidd.Controllers
             _tasks = tasks;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public IEnumerable<Task> GetAll()
         {
             return _dbContext.Tasks.ToList();

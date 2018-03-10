@@ -20,6 +20,9 @@ using Swashbuckle.AspNetCore.Swagger;
 using Craidd.Data;
 using Craidd.Models;
 using Craidd.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
 
 namespace Craidd
 {
@@ -42,41 +45,11 @@ namespace Craidd
             services.AddScoped<TasksService>();
             services.AddScoped<UsersService>();
 
-            services.AddIdentity<User, IdentityRole>()
-                    .AddEntityFrameworkStores<AppDbContext>()
-                    .AddDefaultTokenProviders();
-
-            services.Configure<IdentityOptions>(options =>
-            {
-                // Password settings
-                options.Password.RequireDigit = true;
-                options.Password.RequiredLength = 8;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireLowercase = false;
-                options.Password.RequiredUniqueChars = 6;
-
-                // Lockout settings
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-                options.Lockout.MaxFailedAccessAttempts = 10;
-                options.Lockout.AllowedForNewUsers = true;
-
-                // User settings
-                options.User.RequireUniqueEmail = true;
-            });
-
-            services.ConfigureApplicationCookie(options =>
-            {
-                // Cookie settings
-                options.Cookie.HttpOnly = true;
-                options.Cookie.Expiration = TimeSpan.FromDays(150);
-                options.LoginPath = "/account/login"; // If the LoginPath is not set here, ASP.NET Core will default to /Account/Login
-                options.LogoutPath = "/account/logout"; // If the LogoutPath is not set here, ASP.NET Core will default to /Account/Logout
-                options.AccessDeniedPath = "/account/accessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
-                options.SlidingExpiration = true;
-            });
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                     .AddJwtBearer(options =>
                     {
                         options.TokenValidationParameters = new TokenValidationParameters
@@ -89,8 +62,34 @@ namespace Craidd
                             ValidAudience = Configuration["Jwt:Issuer"],
                             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                         };
+                        options.SaveToken = true;
+                        options.ClaimsIssuer = Configuration["Jwt:Issuer"];
                     });
+            
+            services.AddIdentity<User, IdentityRole>(options =>
+                {
+                    // Password settings
+                    options.Password.RequireDigit = true;
+                    options.Password.RequiredLength = 8;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = true;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequiredUniqueChars = 6;
+
+                    // Lockout settings
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                    options.Lockout.MaxFailedAccessAttempts = 10;
+                    options.Lockout.AllowedForNewUsers = true;
+
+                    // User settings
+                    options.User.RequireUniqueEmail = true;
+                })
+                    .AddEntityFrameworkStores<AppDbContext>()
+                    .AddDefaultTokenProviders();
+            
+            services.AddCors();
             services.AddMvc();
+            services.AddApiVersioning();
 
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new Info { Title = "Rheoli API", Version = "v1" });
@@ -109,18 +108,23 @@ namespace Craidd
                 app.UseBrowserLink();
                 app.UseDatabaseErrorPage();
             }
-
+            
+            app.UseCors(builder =>
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+            );
+            
+            app.UseAuthentication();
+            app.UseMvc();
+            
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
-
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c => {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Rheoli V1");
             });
-
-            app.UseAuthentication();
-
-            app.UseMvc();
         }
     }
 }

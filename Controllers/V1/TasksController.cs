@@ -6,15 +6,26 @@ using Microsoft.AspNetCore.Authorization;
 using Craidd.Models;
 using Craidd.Services;
 using Craidd.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-namespace Craidd.Controllers
+namespace Craidd.Controllers.V1
 {
-    [Route("api/[controller]")]
+    /// <inheritdoc />
+    /// <summary>
+    /// </summary>
+    [ApiVersion( "1.0" )]
+    [Route( "api/v{version:apiVersion}/[controller]" )]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TasksController : Controller
     {
         private readonly AppDbContext _dbContext;
         private readonly TasksService _tasks;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="tasks"></param>
         public TasksController(
             AppDbContext context,
             TasksService tasks
@@ -23,12 +34,21 @@ namespace Craidd.Controllers
             _tasks = tasks;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet, Authorize]
         public IEnumerable<Task> GetAll()
         {
             return _dbContext.Tasks.ToList();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}", Name = "GetTask")]
         public IActionResult GetById(long id)
         {
@@ -74,6 +94,12 @@ namespace Craidd.Controllers
             return CreatedAtRoute("GetTask", new { id = item.Id }, item);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         public IActionResult Update(long id, [FromBody] Task item)
         {

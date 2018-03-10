@@ -17,9 +17,15 @@ namespace Craidd
             BuildWebHost(args).Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .Build();
+        public static IWebHost BuildWebHost(string[] args)
+        {
+            var config = new ConfigurationBuilder().AddCommandLine(args).Build();
+            var enviroment = config["environment"] ?? "Development";
+            
+            return WebHost.CreateDefaultBuilder(args)
+                          .UseEnvironment(enviroment)
+                          .UseStartup<Startup>()
+                          .Build();
+        }
     }
 }

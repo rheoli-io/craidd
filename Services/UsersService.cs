@@ -8,7 +8,7 @@ using Craidd.Models.Validators;
 
 namespace Craidd.Services
 {
-    public class UsersService
+    public class UsersService: IUsersService
     {
         private readonly AppDbContext _dbContext;
         private readonly UserManager<User> _userManager;

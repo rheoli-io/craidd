@@ -21,7 +21,7 @@ namespace Craidd
         {
             var config = new ConfigurationBuilder().AddCommandLine(args).Build();
             var enviroment = config["environment"] ?? "Development";
-            
+
             return WebHost.CreateDefaultBuilder(args)
                           .UseEnvironment(enviroment)
                           .UseStartup<Startup>()

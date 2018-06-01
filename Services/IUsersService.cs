@@ -6,7 +6,8 @@ using Craidd.Models;
 
 namespace Craidd.Services
 {
-    public interface IUsersService {
+    public interface IUsersService
+    {
         UserManager<User> UserManager { get; }
         SignInManager<User> SignInManager { get; }
     }

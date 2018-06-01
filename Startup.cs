@@ -7,10 +7,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,9 +27,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using Craidd.Data;
 using Craidd.Models;
 using Craidd.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Cors.Internal;
+using Craidd.Helpers;
 
 namespace Craidd
 {
@@ -47,6 +49,7 @@ namespace Craidd
             var dbPath = System.IO.Path.Combine(basePath, "AppDb.db");
             services.AddDbContext<AppDbContext>(opt => opt.UseSqlite("Data Source=" + dbPath));
 
+            services.AddTransient<IApiResponseHelper, ApiResponseHelper>();
             services.AddScoped<TasksService>();
             services.AddScoped<IUsersService, UsersService>();
 

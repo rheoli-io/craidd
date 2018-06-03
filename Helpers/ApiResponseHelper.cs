@@ -40,7 +40,7 @@ namespace Craidd.Helpers
 
             if (! (sourceParameter is null) )
             {
-                error.Add(new JProperty("source", new JObject( new JProperty("parameter", sourceParameter))));
+                error.Add(new JProperty("source", new JObject( new JProperty("parameter", sourceParameter.ToLower()))));
             }
 
             ErrorReponse["errors"].Value<JArray>().Add(error);

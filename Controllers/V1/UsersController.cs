@@ -76,7 +76,7 @@ namespace Craidd.Controllers.V1
                 return BadRequest(_apiResponse.ParseModelStateResponse(ModelState).ErrorReponse);
             }
 
-            var user = new User { UserName = item.Email, Email = item.Email };
+            var user = new User { UserName = item.UserName, Email = item.Email };
             var result = await _users.UserManager.CreateAsync(user, item.Password);
 
             if (result.Succeeded == false) {

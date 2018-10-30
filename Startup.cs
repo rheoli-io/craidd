@@ -45,8 +45,7 @@ namespace Craidd
         {
             System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
-            var basePath = AppContext.BaseDirectory;
-            var dbPath = System.IO.Path.Combine(basePath, "AppDb.db");
+            var dbPath = System.IO.Path.GetFullPath(Configuration["Db:Path"]);
             services.AddDbContext<AppDbContext>(opt => opt.UseSqlite("Data Source=" + dbPath));
 
             services.AddTransient<IApiResponseHelper, ApiResponseHelper>();
@@ -82,9 +81,8 @@ namespace Craidd
                     options.Password.RequireDigit = true;
                     options.Password.RequiredLength = 8;
                     options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireUppercase = true;
+                    options.Password.RequireUppercase = false;
                     options.Password.RequireLowercase = false;
-                    options.Password.RequiredUniqueChars = 6;
 
                     // Lockout settings
                     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);

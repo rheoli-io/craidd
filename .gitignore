@@ -1,6 +1,8 @@
 # ignore appsettings specific environment variables
 # poor man's .env file :)
+# keep the example file in tracking
 appsettings.*.json
+!appsettings.Example.json
 
 ## Taken from OmniSharp Yeoman generator https://github.com/OmniSharp/generator-aspnet/blob/master/templates/gitignore.txt
 ## Ignore Visual Studio temporary files, build results, and

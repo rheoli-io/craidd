@@ -28,7 +28,7 @@ using Craidd.Data;
 using Craidd.Models;
 using Craidd.Services;
 using Craidd.Helpers;
-
+using Craidd.Extensions;
 namespace Craidd
 {
     public class Startup
@@ -49,6 +49,26 @@ namespace Craidd
             services.AddDbContext<AppDbContext>(opt => opt.UseSqlite("Data Source=" + dbPath));
 
             services.AddTransient<IApiResponseHelper, ApiResponseHelper>();
+            services.AddSingleton<ITemplatesService>(service => new TemplatesService(templatePath: System.IO.Path.Combine(Environment.CurrentDirectory, "Views")));
+
+            // services.AddScoped<IEmailsService>(service =>
+            // {
+            //     var options = Configuration.GetSection("Email:Smtp")
+            //                                .GetChildren().ToDictionary(x => x.Key, x => x.Value);
+            //     return new EmailsService(options: options, templatesService: service.GetService<ITemplatesService>());
+            // });
+
+            services.AddEmail(options =>
+            {
+                options.host = Configuration["Email:Smtp:Host"];
+                options.port = Int32.Parse(Configuration["Email:Smtp:Port"]);
+                options.useSSL = Boolean.Parse(Configuration["Email:Smtp:UseSSL"]);
+                options.username = Configuration["Email:Smtp:Username"];
+                options.password = Configuration["Email:Smtp:Password"];
+                options.fromName = Configuration["Email:Smtp:FromName"];
+                options.fromEmail = Configuration["Email:Smtp:FromEmail"];
+            });
+
             services.AddScoped<TasksService>();
             services.AddScoped<IUsersService, UsersService>();
 
@@ -92,6 +112,9 @@ namespace Craidd
                     // User settings
                     options.User.RequireUniqueEmail = true;
 
+                    // Require an email validation before login
+                    options.SignIn.RequireConfirmedEmail = true;
+
                     options.ClaimsIdentity.UserIdClaimType = JwtRegisteredClaimNames.Sub;
                 })
                     .AddEntityFrameworkStores<AppDbContext>()
@@ -102,7 +125,8 @@ namespace Craidd
             services.AddApiVersioning();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddSwaggerGen(c => {
+            services.AddSwaggerGen(c =>
+            {
                 c.SwaggerDoc("v1", new Info { Title = "Rheoli API", Version = "v1" });
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Craidd.xml");
@@ -127,14 +151,15 @@ namespace Craidd
                     .AllowCredentials()
             );
 
-           // System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimFilter.Clear();
+            // System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimFilter.Clear();
             app.UseAuthentication();
             app.UseMvc();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c => {
+            app.UseSwaggerUI(c =>
+            {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Rheoli V1");
             });
         }

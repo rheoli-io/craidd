@@ -34,12 +34,15 @@ namespace Craidd.Controllers.V1
         private readonly IHttpContextAccessor _httpContext;
         private IApiResponseHelper _apiResponse;
 
+        private readonly IEmailsService _emails;
+
         public UsersController(
             IConfiguration config,
             IHttpContextAccessor httpContextAccessor,
             TasksService tasks,
             IUsersService users,
-            IApiResponseHelper apiResponse
+            IApiResponseHelper apiResponse,
+            IEmailsService emailsService
         )
         {
             _config = config;
@@ -47,6 +50,7 @@ namespace Craidd.Controllers.V1
             _users = users;
             _httpContext = httpContextAccessor;
             _apiResponse = apiResponse;
+            _emails = emailsService;
         }
 
         [HttpGet]
@@ -86,6 +90,10 @@ namespace Craidd.Controllers.V1
 
                 return BadRequest(_apiResponse.ErrorReponse);
             }
+
+            await this._emails.sendEmailFromTemplateAsync(user.Email, "Registered", "Register", new Dictionary<string, object> {
+                {"Name", user.UserName}
+            });
 
             return StatusCode(StatusCodes.Status201Created, new {
                 data = new { id = user.Id }

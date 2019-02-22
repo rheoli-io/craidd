@@ -10,6 +10,6 @@ namespace Craidd.Services
     {
         UserManager<User> UserManager { get; }
         SignInManager<User> SignInManager { get; }
+        RoleManager<Role> RoleManager { get; }
     }
-
 }

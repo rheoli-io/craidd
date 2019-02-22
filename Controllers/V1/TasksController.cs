@@ -1,12 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
 using Craidd.Models;
+using TaskModel = Craidd.Models.Task;
 using Craidd.Services;
 using Craidd.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Task = System.Threading.Tasks.Task;
 
 namespace Craidd.Controllers.V1
 {
@@ -20,16 +24,21 @@ namespace Craidd.Controllers.V1
     {
         private readonly AppDbContext _dbContext;
         private readonly TasksService _tasks;
+        private readonly IAuthorizationService _authorizationService;
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="authorizationService"></param>
         /// <param name="context"></param>
         /// <param name="tasks"></param>
         public TasksController(
+            IAuthorizationService authorizationService,
             AppDbContext context,
             TasksService tasks
-        ) {
+        )
+        {
+            _authorizationService = authorizationService;
             _dbContext = context;
             _tasks = tasks;
         }
@@ -38,10 +47,12 @@ namespace Craidd.Controllers.V1
         /// 
         /// </summary>
         /// <returns></returns>
-        [HttpGet, Authorize]
-        public IEnumerable<Task> GetAll()
+        [HttpGet]
+        [Authorize("tasks")]
+        public async Task<IActionResult> GetAll()
         {
-            return _dbContext.Tasks.ToList();
+            return Ok(new {here = "here"});
+            // return Ok(_dbContext.Tasks.ToList());
         }
 
         /// <summary>
@@ -78,10 +89,10 @@ namespace Craidd.Controllers.V1
         /// <returns>A newly-created Task</returns>
         /// <response code="201">Returns the newly-created item</response>
         /// <response code="400">If the item is null</response>
-        [ProducesResponseType(typeof(Task), 201)]
-        [ProducesResponseType(typeof(Task), 400)]
+        [ProducesResponseType(typeof(TaskModel), 201)]
+        [ProducesResponseType(typeof(TaskModel), 400)]
         [HttpPost]
-        public IActionResult Create([FromBody] Task item)
+        public IActionResult Create([FromBody] TaskModel item)
         {
             if (item == null)
             {
@@ -101,7 +112,7 @@ namespace Craidd.Controllers.V1
         /// <param name="item"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
-        public IActionResult Update(long id, [FromBody] Task item)
+        public IActionResult Update(long id, [FromBody] TaskModel item)
         {
             if (item == null || item.Id != id)
             {

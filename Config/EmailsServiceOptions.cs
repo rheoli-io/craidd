@@ -32,7 +32,7 @@ namespace Craidd.Config
 
         /// <summary>
         /// Gets or sets the email for the from address.
-        ///
+        /// </summary>
         public string fromEmail { get; set; }
 
         /// <summary>

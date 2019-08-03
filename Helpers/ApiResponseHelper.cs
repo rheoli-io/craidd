@@ -40,7 +40,7 @@ namespace Craidd.Helpers
 
             if (! (sourceParameter is null) )
             {
-                error.Add(new JProperty("source", new JObject( new JProperty("parameter", sourceParameter.ToLower()))));
+                error.Add(new JProperty("source", new JObject( new JProperty("pointer", sourceParameter.ToLower()))));
             }
 
             ErrorReponse["errors"].Value<JArray>().Add(error);
@@ -64,7 +64,7 @@ namespace Craidd.Helpers
 
                 foreach (var errorMessage in errorMessages)
                 {
-                    AddErrorResponse(sourceParameter: stateError.Key, detail: errorMessage.ErrorMessage);
+                    AddErrorResponse(sourceParameter: $"data/attributes/{stateError.Key}", detail: errorMessage.ErrorMessage);
                 }
             }
 

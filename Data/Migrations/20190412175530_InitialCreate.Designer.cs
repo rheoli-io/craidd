@@ -9,14 +9,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Craidd.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20181230190231_Initial")]
-    partial class Initial
+    [Migration("20190412175530_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity("Craidd.Models.Role", b =>
                 {
@@ -44,24 +44,10 @@ namespace Craidd.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            ConcurrencyStamp = "cf23f45d-de01-4278-83e5-a6a83e8e6ecd",
+                            ConcurrencyStamp = "a6ffebe0-44a6-4138-a8bc-8b29c50f790e",
                             Name = "admin",
                             NormalizedName = "admin"
                         });
-                });
-
-            modelBuilder.Entity("Craidd.Models.Task", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("IsComplete");
-
-                    b.Property<string>("Name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tasks");
                 });
 
             modelBuilder.Entity("Craidd.Models.User", b =>
@@ -118,15 +104,15 @@ namespace Craidd.Migrations
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8339a963-5aed-4247-aa8c-8807decdf776",
+                            ConcurrencyStamp = "59b57a03-f644-456f-8d08-a6fe50d1689f",
                             Email = "admin@example.org",
                             EmailConfirmed = true,
                             LockoutEnabled = true,
                             NormalizedEmail = "ADMIN@EXAMPLE.ORG",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAEEZ4cZCIcWwatW970wYiLmikUCIxrUXW0zkZ0rfc/60WNz1PlsLQ4kLFpySCIIi1YA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEH+fahLfs8ElowDrJFsnVv4MmLBQuK6h7zg7NIi3b6zymelplIgobtSdDJpFcbEMvQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "fddcbae5-2be0-451c-9627-2e4e6a3fba42",
+                            SecurityStamp = "e6f6fdfe-c6ce-43b4-94bb-3cda31e9f000",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });
@@ -155,7 +141,7 @@ namespace Craidd.Migrations
                         {
                             Id = 1,
                             ClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
-                            ClaimValue = "tasks",
+                            ClaimValue = "todo",
                             RoleId = "a18be9c0-aa65-4af8-bd17-00bd9344e575"
                         });
                 });

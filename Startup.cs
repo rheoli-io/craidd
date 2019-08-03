@@ -1,37 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using System.Reflection;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.Mvc.Cors.Internal;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
-using Swashbuckle.AspNetCore.Swagger;
+using JsonApiDotNetCore.Extensions;
 
+using Craidd.Auth;
+using Craidd.Config;
 using Craidd.Data;
 using Craidd.Models;
 using Craidd.Services;
 using Craidd.Helpers;
 using Craidd.Extensions;
-using Microsoft.AspNetCore.Authorization;
-using Task = System.Threading.Tasks.Task;
-using Craidd.Auth;
 
 namespace Craidd
 {
@@ -44,7 +37,10 @@ namespace Craidd
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        ///     This method gets called by the runtime. Use this method to add services to the container.
+        /// </summary>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
             System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -66,7 +62,6 @@ namespace Craidd
                 options.fromEmail = Configuration["Email:Smtp:FromEmail"];
             });
 
-            services.AddScoped<TasksService>();
             services.AddScoped<IUsersService, UsersService>();
 
             services.AddAuthentication(options =>
@@ -114,6 +109,7 @@ namespace Craidd
 
                 options.ClaimsIdentity.UserIdClaimType = JwtRegisteredClaimNames.Sub;
             });
+
             builder = new IdentityBuilder(builder.UserType, typeof(Role), builder.Services);
             builder.AddEntityFrameworkStores<AppDbContext>()
                    .AddDefaultTokenProviders();
@@ -121,31 +117,29 @@ namespace Craidd
             builder.AddRoleManager<RoleManager<Role>>();
             builder.AddSignInManager<SignInManager<User>>();
 
-            var defaultApiVersion = new ApiVersion(1, 0);
-
             services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            // authorization management
             services.AddAuthorization();
-
             // register the scope authorization handler
             services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
             services.AddScoped<IAuthorizationHandler, HasScopeHandler>();
 
-            services.AddApiVersioning(options => {
-                options.ReportApiVersions = true;
-                options.AssumeDefaultVersionWhenUnspecified = true;
-                options.DefaultApiVersion = defaultApiVersion;
+            services.AddJsonApi<AppDbContext>(options =>
+            {
+                options.Namespace = "api";
+                options.ValidateModelState = true;
             });
 
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(options =>
             {
-                c.SwaggerDoc("v1", new Info { Title = Configuration["Project:Name"], Version = "v" + defaultApiVersion.MajorVersion.ToString() });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = Configuration["Project:Name"], Version = "v1" });
                 // Set the comments path for the Swagger JSON and UI.
-                var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Craidd.xml");
-                c.IncludeXmlComments(xmlPath);
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
+                options.IncludeXmlComments(xmlPath);
             });
         }
 
@@ -159,22 +153,22 @@ namespace Craidd
                 app.UseDatabaseErrorPage();
             }
 
-            app.UseCors(builder =>
-                builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials()
+            app.UseCors(options =>
+                options.WithOrigins("http://localhost:3000")
+                       .AllowAnyMethod()
+                       .AllowAnyHeader()
+                       .AllowCredentials()
             );
 
             app.UseAuthentication();
-            app.UseMvc();
+            app.UseJsonApi();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
+            app.UseSwaggerUI(options =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Rheoli V1");
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Rheoli V1");
             });
         }
     }

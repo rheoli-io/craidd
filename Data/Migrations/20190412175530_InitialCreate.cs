@@ -1,9 +1,11 @@
 ﻿using System;
+using Craidd.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Craidd.Migrations
 {
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -19,20 +21,6 @@ namespace Craidd.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Tasks",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(nullable: true),
-                    IsComplete = table.Column<bool>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tasks", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -169,17 +157,18 @@ namespace Craidd.Migrations
             migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "a18be9c0-aa65-4af8-bd17-00bd9344e575", "cf23f45d-de01-4278-83e5-a6a83e8e6ecd", "admin", "admin" });
+                values: new object[] { "a18be9c0-aa65-4af8-bd17-00bd9344e575", "a6ffebe0-44a6-4138-a8bc-8b29c50f790e", "admin", "admin" });
 
+            var hasher = new PasswordHasher<User>();
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "a18be9c0-aa65-4af8-bd17-00bd9344e575", 0, "8339a963-5aed-4247-aa8c-8807decdf776", "admin@example.org", true, true, null, "ADMIN@EXAMPLE.ORG", "ADMIN", "AQAAAAEAACcQAAAAEEZ4cZCIcWwatW970wYiLmikUCIxrUXW0zkZ0rfc/60WNz1PlsLQ4kLFpySCIIi1YA==", null, false, "fddcbae5-2be0-451c-9627-2e4e6a3fba42", false, "admin" });
+                values: new object[] { "a18be9c0-aa65-4af8-bd17-00bd9344e575", 0, "59b57a03-f644-456f-8d08-a6fe50d1689f", "admin@example.org", true, true, null, "ADMIN@EXAMPLE.ORG", "ADMIN", hasher.HashPassword(null, "admin"), null, false, "e6f6fdfe-c6ce-43b4-94bb-3cda31e9f000", false, "admin" });
 
             migrationBuilder.InsertData(
                 table: "RoleClaims",
                 columns: new[] { "Id", "ClaimType", "ClaimValue", "RoleId" },
-                values: new object[] { 1, "http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "tasks", "a18be9c0-aa65-4af8-bd17-00bd9344e575" });
+                values: new object[] { 1, "http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "todo", "a18be9c0-aa65-4af8-bd17-00bd9344e575" });
 
             migrationBuilder.InsertData(
                 table: "UserRoles",
@@ -228,9 +217,6 @@ namespace Craidd.Migrations
         {
             migrationBuilder.DropTable(
                 name: "RoleClaims");
-
-            migrationBuilder.DropTable(
-                name: "Tasks");
 
             migrationBuilder.DropTable(
                 name: "UserClaims");

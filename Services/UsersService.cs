@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 
 using Craidd.Data;
 using Craidd.Models;
-using Craidd.Models.Validators;
 
 namespace Craidd.Services
 {

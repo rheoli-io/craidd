@@ -21,15 +21,13 @@ using Craidd.Models.Validators;
 using Craidd.Models;
 using Craidd.Services;
 
-namespace Craidd.Controllers.V1
+namespace Craidd.Controllers
 {
-    [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/[controller]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UsersController : ControllerBase
     {
         private IConfiguration _config;
-        private readonly TasksService _tasks;
         private readonly IUsersService _users;
         private readonly IHttpContextAccessor _httpContext;
         private IApiResponseHelper _apiResponse;
@@ -39,14 +37,12 @@ namespace Craidd.Controllers.V1
         public UsersController(
             IConfiguration config,
             IHttpContextAccessor httpContextAccessor,
-            TasksService tasks,
             IUsersService users,
             IApiResponseHelper apiResponse,
             IEmailsService emailsService
         )
         {
             _config = config;
-            _tasks = tasks;
             _users = users;
             _httpContext = httpContextAccessor;
             _apiResponse = apiResponse;
